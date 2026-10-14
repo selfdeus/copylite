@@ -1,4 +1,4 @@
-name: build
+name: Compilar
 
 on:
   push:
@@ -7,13 +7,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: paint-anything-fabric-26.3
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 25
@@ -22,12 +19,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Compilar
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build
 
-      - name: Guardar el mod compilado
+      - name: Subir el mod
         uses: actions/upload-artifact@v4
         with:
-          name: paint_anything-fabric-26.3
+          name: copycats-lite
           path: |
-            paint-anything-fabric-26.3/build/libs/*.jar
-            !paint-anything-fabric-26.3/build/libs/*-sources.jar
+            build/libs/*.jar
+            !build/libs/*-sources.jar
