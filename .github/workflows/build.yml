@@ -7,6 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: copycats_lite
     steps:
       - uses: actions/checkout@v4
 
@@ -26,5 +29,5 @@ jobs:
         with:
           name: copycats-lite
           path: |
-            build/libs/*.jar
-            !build/libs/*-sources.jar
+            copycats_lite/build/libs/*.jar
+            !copycats_lite/build/libs/*-sources.jar
