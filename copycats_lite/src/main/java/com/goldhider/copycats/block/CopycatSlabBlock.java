@@ -95,12 +95,16 @@ public class CopycatSlabBlock extends Block implements EntityBlock {
 			return existing.setValue(SLAB_TYPE, SlabType.DOUBLE);
 		}
 
-		Direction look = Direction.UP;
-		for (Direction direction : context.getNearestLookingDirections()) {
-			look = direction;
-			break;
+		// Como una losa normal: eje Y por defecto. Agachado (shift), se coloca vertical según hacia dónde mires.
+		Axis axis = Axis.Y;
+		if (context.isSecondaryUseActive()) {
+			for (Direction direction : context.getNearestLookingDirections()) {
+				if (direction.getAxis().isHorizontal()) {
+					axis = direction.getAxis();
+					break;
+				}
+			}
 		}
-		Axis axis = look.getAxis();
 		boolean upperHalfClicked = isUpperHalf(axis, context);
 		Direction clickedFace = context.getClickedFace();
 		boolean bottom = clickedFace == Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE)
