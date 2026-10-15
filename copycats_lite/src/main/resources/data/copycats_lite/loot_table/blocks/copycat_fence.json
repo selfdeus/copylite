@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "copycats_lite:copycat_fence"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "copycats_lite:blocks/copycat_fence"
+}
