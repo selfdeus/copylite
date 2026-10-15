@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "copycats_lite:item/copycat_hanging_sign"
+  }
+}
