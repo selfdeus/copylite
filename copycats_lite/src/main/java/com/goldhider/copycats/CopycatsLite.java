@@ -18,6 +18,8 @@ public class CopycatsLite implements ModInitializer {
 
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(content -> {
 			content.accept(CCRegistry.COPYCAT_ITEM);
+			content.accept(CCRegistry.COPYCAT_SLAB_ITEM);
+			content.accept(CCRegistry.COPYCAT_STAIRS_ITEM);
 		});
 	}
 }

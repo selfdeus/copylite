@@ -1,4 +1,8 @@
 {
   "block.copycats_lite.copycat_block": "Copycat Block",
-  "item.copycats_lite.copycat_block": "Copycat Block"
+  "item.copycats_lite.copycat_block": "Copycat Block",
+  "block.copycats_lite.copycat_slab": "Copycat Slab",
+  "item.copycats_lite.copycat_slab": "Copycat Slab",
+  "block.copycats_lite.copycat_stairs": "Copycat Stairs",
+  "item.copycats_lite.copycat_stairs": "Copycat Stairs"
 }

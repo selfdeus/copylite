@@ -1,9 +1,16 @@
 package com.goldhider.copycats.client;
 
+import com.goldhider.copycats.client.assembly.CopycatRenderContext;
+import com.goldhider.copycats.client.model.CopycatCores;
+import com.goldhider.copycats.client.model.CopycatModelCore;
+import com.goldhider.copycats.client.model.MeshRenderContext;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.blockgetter.v2.FabricBlockGetter;
 import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
+import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
+import net.fabricmc.fabric.api.client.renderer.v1.mesh.MutableMesh;
 import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
@@ -22,19 +29,21 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Modelo del copycat: si hay material, emite los quads del modelo del material;
- * si no, emite el modelo base (textura "vacía").
+ * Modelo del copycat. Toma los quads del modelo del material copiado (o del modelo base si no hay material)
+ * y, si el bloque tiene una forma ("shape"), los recorta y reensambla con el motor de piezas.
  *
- * Basado en FrameBlockStateModel del testmod de Fabric API 0.162.0+26.3.
- *
- * Limitación conocida de este primer corte: el material no recibe tinte de bioma (césped, hojas)
- * y solo se copia el cubo completo (las formas llegan en el siguiente paso).
+ * Limitación conocida: el material no recibe tinte de bioma (césped, hojas).
  */
 public class CopycatBlockStateModel implements BlockStateModel {
 	private final BlockStateModel baseModel;
+	private final String shape;
+	@Nullable
+	private final CopycatModelCore core;
 
-	public CopycatBlockStateModel(BlockStateModel baseModel) {
+	public CopycatBlockStateModel(BlockStateModel baseModel, String shape) {
 		this.baseModel = baseModel;
+		this.shape = shape;
+		this.core = CopycatCores.get(shape);
 	}
 
 	/** Lee el material desde los datos de render (inmutables) de la block entity. */
@@ -52,11 +61,24 @@ public class CopycatBlockStateModel implements BlockStateModel {
 	@Override
 	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, Predicate<@Nullable Direction> cullTest) {
 		BlockState material = getMaterial(level, pos);
-		if (material == null) {
-			baseModel.emitQuads(emitter, level, pos, state, random, cullTest);
+		BlockStateModel source = material == null ? baseModel : modelOf(material);
+		BlockState sourceState = material == null ? state : material;
+
+		if (core == null) {
+			// Cubo completo: se emite el modelo de origen sin cambios.
+			source.emitQuads(emitter, level, pos, sourceState, random, cullTest);
 			return;
 		}
-		modelOf(material).emitQuads(emitter, level, pos, material, random, cullTest);
+
+		// Se capturan los quads del cubo de origen (sin descartar ninguno) y se reensamblan con la forma del bloque.
+		MutableMesh mesh = Renderer.get().mutableMesh();
+		source.emitQuads(mesh.emitter(), level, pos, sourceState, random, face -> false);
+
+		CopycatRenderContext context = new MeshRenderContext(mesh, emitter, CopycatModelCore.MATERIAL_KEY);
+		core.emitCopycatQuads(CopycatModelCore.MATERIAL_KEY, state, context, sourceState);
+	}
+
+	private record GeometryKey(Object sub, BlockState state) {
 	}
 
 	@Override
@@ -64,18 +86,14 @@ public class CopycatBlockStateModel implements BlockStateModel {
 	public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
 		BlockState material = getMaterial(level, pos);
 		if (material == null) {
-			return this;
+			return new GeometryKey(this, state);
 		}
 
 		Object subkey = modelOf(material).createGeometryKey(level, pos, material, random);
 		if (subkey == null) {
 			return null;
 		}
-
-		record Key(Object subkey) {
-		}
-
-		return new Key(subkey);
+		return new GeometryKey(subkey, state);
 	}
 
 	@Override
@@ -115,9 +133,10 @@ public class CopycatBlockStateModel implements BlockStateModel {
 		return BakedQuad.FLAG_ANIMATED | BakedQuad.FLAG_TRANSLUCENT;
 	}
 
-	public record Unbaked(BlockStateModel.Unbaked baseModel) implements CustomUnbakedBlockStateModel {
+	public record Unbaked(BlockStateModel.Unbaked baseModel, String shape) implements CustomUnbakedBlockStateModel {
 		public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-				BlockStateModel.Unbaked.CODEC.fieldOf("base_model").forGetter(Unbaked::baseModel)
+				BlockStateModel.Unbaked.CODEC.fieldOf("base_model").forGetter(Unbaked::baseModel),
+				Codec.STRING.optionalFieldOf("shape", "block").forGetter(Unbaked::shape)
 		).apply(instance, Unbaked::new));
 
 		@Override
@@ -132,7 +151,7 @@ public class CopycatBlockStateModel implements BlockStateModel {
 
 		@Override
 		public BlockStateModel bake(ModelBaker baker) {
-			return new CopycatBlockStateModel(baseModel.bake(baker));
+			return new CopycatBlockStateModel(baseModel.bake(baker), shape);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 {
   "values": [
-    "copycats_lite:copycat_block"
+    "copycats_lite:copycat_block",
+    "copycats_lite:copycat_slab",
+    "copycats_lite:copycat_stairs"
   ]
 }
