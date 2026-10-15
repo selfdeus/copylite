@@ -26,11 +26,11 @@ public record QuadUVRotate(Direction face, float pivotU, float pivotV, float rot
                 float u = getUnInterpolatedU(sprite, quad.vertices.get(vertex).uv.u) - pivotU;
                 float v = getUnInterpolatedV(sprite, quad.vertices.get(vertex).uv.v) - pivotV;
 
-                double cos = Math.cos(Math.toRadians(rotation));
-                double sin = Math.sin(Math.toRadians(rotation));
+                float cos = (float) Math.cos(Math.toRadians(rotation));
+float sin = (float) Math.sin(Math.toRadians(rotation));
 
-                quad.vertices.get(vertex).uv.u = sprite.getU(u * cos - v * sin + pivotU);
-                quad.vertices.get(vertex).uv.v = sprite.getV(u * sin + v * cos + pivotV);
+quad.vertices.get(vertex).uv.u = sprite.getU(u * cos - v * sin + pivotU);
+quad.vertices.get(vertex).uv.v = sprite.getV(u * sin + v * cos + pivotV);
             }
         }
         return true;
