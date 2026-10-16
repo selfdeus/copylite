@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "copycats_lite:copycat_block"
+  ],
+  "result": {
+    "count": 2,
+    "id": "copycats_lite:copycat_shelf"
+  }
+}
