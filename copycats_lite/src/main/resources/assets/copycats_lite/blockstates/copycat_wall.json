@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "": {
+      "fabric:type": "copycats_lite:copycat",
+      "shape": "wall",
+      "base_model": { "model": "copycats_lite:block/copycat_block" }
+    }
+  }
+}
