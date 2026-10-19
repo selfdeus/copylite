@@ -25,9 +25,10 @@ public class CopycatSlabModelCore extends CopycatModelCore {
         Axis axis = state.getValue(CopycatSlabBlock.AXIS);
         SlabType type = state.getValue(CopycatSlabBlock.SLAB_TYPE);
 
-        // Losa doble: cubo completo, sin costura ni bordes repetidos en medio.
+        // Losa doble: cubo completo armado con piezas (igual que un layer de 8 capas), sin costura en medio.
+        // No se usa assembleAll(): copiar los quads tal cual hacía que Sodium (Block Face Culling) los descartara.
         if (type == SlabType.DOUBLE) {
-            context.assembleAll();
+            assembleFull(context, axis);
             return;
         }
 
@@ -37,6 +38,18 @@ public class CopycatSlabModelCore extends CopycatModelCore {
         }
         if (type != SlabType.BOTTOM) {
             assembleHalf(context, Direction.fromAxisAndDirection(axis, AxisDirection.NEGATIVE));
+        }
+    }
+
+    private static void assembleFull(CopycatRenderContext context, Axis axis) {
+        if (axis.isHorizontal()) {
+            Direction facing = Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE);
+            AssemblyTransform transform = t -> t.rotateY((int) facing.toYRot());
+            context.assemblePiece(transform, vec3(0, 0, 0), aabb(16, 16, 8), cull(SOUTH));
+            context.assemblePiece(transform, vec3(0, 0, 8), aabb(16, 16, 8).move(0, 0, 8), cull(NORTH));
+        } else {
+            context.assemblePiece(AssemblyTransform.IDENTITY, vec3(0, 0, 0), aabb(16, 8, 16), cull(UP));
+            context.assemblePiece(AssemblyTransform.IDENTITY, vec3(0, 8, 0), aabb(16, 8, 16).move(0, 8, 0), cull(DOWN));
         }
     }
 
