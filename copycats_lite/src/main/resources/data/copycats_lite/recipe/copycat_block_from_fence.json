@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "copycats_lite:copycat_fence",
+    "copycats_lite:copycat_fence"
+  ],
+  "result": {
+    "count": 1,
+    "id": "copycats_lite:copycat_block"
+  }
+}

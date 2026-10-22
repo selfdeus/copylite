@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer",
+    "copycats_lite:copycat_layer"
+  ],
+  "result": {
+    "count": 1,
+    "id": "copycats_lite:copycat_block"
+  }
+}

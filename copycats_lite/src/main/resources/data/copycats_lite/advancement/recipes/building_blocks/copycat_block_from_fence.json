@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_copycat_fence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "copycats_lite:copycat_fence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "copycats_lite:copycat_block_from_fence"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_copycat_fence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "copycats_lite:copycat_block_from_fence"
+    ]
+  }
+}
